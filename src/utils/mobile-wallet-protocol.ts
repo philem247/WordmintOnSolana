@@ -360,6 +360,7 @@ async function decryptMobileWalletResponse(
   );
 
   if (!decryptedMessage) {
+    // THIS IS WHERE THE PREVIOUS ERROR WAS TRACEABLE TO.
     throw new Error('Failed to decrypt response: Invalid key or nonce.');
   }
 
@@ -382,20 +383,21 @@ async function decryptMobileWalletResponse(
   }
 }
 
+// ============================================
+// UTILITY FUNCTIONS (CORRECTED IMPLEMENTATIONS FOR BINARY SAFETY)
+// ============================================
+
 /**
- * Convert ArrayBuffer to Base64
+ * Convert Uint8Array to Base64 (More Robust for Binary Data)
+ * NOTE: The input type has been corrected to Uint8Array to align with nacl.
  */
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
+function arrayBufferToBase64(buffer: Uint8Array): string {
+  // Use String.fromCharCode.apply() on the Uint8Array for reliable binary-to-string conversion
+  return btoa(String.fromCharCode.apply(null, Array.from(buffer)));
 }
 
 /**
- * Convert Base64 to ArrayBuffer
+ * Convert Base64 to Uint8Array (Standard and Correct implementation)
  */
 function base64ToArrayBuffer(base64: string): Uint8Array {
   const binary = atob(base64);
