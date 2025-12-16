@@ -4,10 +4,10 @@
  * for secure mobile wallet connections with session-based encryption.
  * * Protocol Flow:
  * 1. Generate ephemeral keypair for session encryption (using Ed25519)
- * 2. Build authorization URL with session public key
+ * 2. Build authorization URL with session public key (Base58 encoded)
  * 3. Deep link to wallet app (Phantom/Solflare)
  * 4. Wallet encrypts response with session public key
- * 5. Return to app via redirect URL with encrypted data
+ * 5. Return to app via redirect URL with encrypted data (Base58 encoded params)
  * 6. Decrypt response with session private key (using nacl.box)
  * 7. Verify signature and extract wallet public key
  * * Spec: https://github.com/solana-mobile/mobile-wallet-adapter/blob/main/js/packages/mobile-wallet-adapter-protocol/README.md
@@ -23,8 +23,8 @@ import * as nacl from 'tweetnacl';
 
 export interface MobileWalletSession {
   sessionId: string;
-  publicKey: string; // App's ephemeral public key (base64)
-  privateKey: string; // App's ephemeral private key (base64) - NEVER send to wallet
+  publicKey: string; // App's ephemeral public key (Base64 for local storage)
+  privateKey: string; // App's ephemeral private key (Base64 for local storage)
   created: number;
   expiresAt: number;
 }
@@ -119,14 +119,18 @@ export function generatePhantomDeepLink(config: DeepLinkConfig, session: MobileW
   // Build redirect URL with session ID
   const redirectUrl = `${appUrl}?mobile_return=true&session=${session.sessionId}`;
   
+  // CRITICAL FIX: Convert stored Base64 key to Base58 for the wallet URL
+  const publicKeyBytes = base64ToArrayBuffer(session.publicKey);
+  const base58PublicKey = bs58.encode(publicKeyBytes);
+
   // Phantom deep link format
   const params = new URLSearchParams({
     app_url: appUrl,
     redirect_link: redirectUrl,
     cluster: 'devnet', // Use devnet for WordMint
     ref: appName.toLowerCase().replace(/\s+/g, ''),
-    // Include our ephemeral public key for the wallet to encrypt the response
-    dapp_encryption_public_key: session.publicKey // Pass the Base64 public key
+    // CRITICAL FIX: Use Base58 encoded key
+    dapp_encryption_public_key: base58PublicKey
   });
   
   // Add optional parameters
@@ -136,7 +140,7 @@ export function generatePhantomDeepLink(config: DeepLinkConfig, session: MobileW
   
   const deepLink = `https://phantom.app/ul/v1/connect?${params.toString()}`;
   
-  console.log('🔗 Phantom deep link:', deepLink);
+  console.log('🔗 Phantom deep link generated');
   return deepLink;
 }
 
@@ -150,13 +154,18 @@ export function generateSolflareDeepLink(config: DeepLinkConfig, session: Mobile
   // Build redirect URL with session ID
   const redirectUrl = `${appUrl}?mobile_return=true&session=${session.sessionId}`;
   
+  // CRITICAL FIX: Convert stored Base64 key to Base58 for the wallet URL
+  const publicKeyBytes = base64ToArrayBuffer(session.publicKey);
+  const base58PublicKey = bs58.encode(publicKeyBytes);
+
   // Solflare deep link format
   const params = new URLSearchParams({
     app_url: appUrl,
     redirect_link: redirectUrl,
     cluster: 'devnet',
     ref: appName.toLowerCase().replace(/\s+/g, ''),
-    dapp_encryption_public_key: session.publicKey // Pass the Base64 public key
+    // CRITICAL FIX: Use Base58 encoded key
+    dapp_encryption_public_key: base58PublicKey 
   });
   
   if (iconUrl) {
@@ -165,7 +174,7 @@ export function generateSolflareDeepLink(config: DeepLinkConfig, session: Mobile
   
   const deepLink = `https://solflare.com/ul/v1/connect?${params.toString()}`;
   
-  console.log('🔗 Solflare deep link:', deepLink);
+  console.log('🔗 Solflare deep link generated');
   return deepLink;
 }
 
@@ -212,19 +221,7 @@ export function isMobileWalletReturn(): boolean {
  */
 export async function parseMobileWalletResponse(): Promise<WalletAuthorizationResponse | null> {
   const urlParams = new URLSearchParams(window.location.search);
-  
-  // Check for Phantom response
-  if (urlParams.has('phantom_encryption_public_key')) {
-    console.log('📱 Parsing Phantom mobile response');
-    return parsePhantomResponse(urlParams);
-  }
-  
-  // Check for Solflare response
-  if (urlParams.has('solflare_encryption_public_key')) {
-    console.log('📱 Parsing Solflare mobile response');
-    return parseSolflareResponse(urlParams);
-  }
-  
+
   // Check for errorCode (rejection)
   if (urlParams.has('errorCode')) {
     const errorCode = urlParams.get('errorCode');
@@ -239,19 +236,26 @@ export async function parseMobileWalletResponse(): Promise<WalletAuthorizationRe
     throw new Error(`Wallet error: ${errorMessage}`);
   }
   
-  return null;
-}
+  // Detect provider and get Wallet Public Key (Base58)
+  let walletPublicKeyBase58 = urlParams.get('phantom_encryption_public_key');
+  let provider = 'Phantom';
 
-/**
- * Parse Phantom mobile wallet response
- */
-async function parsePhantomResponse(urlParams: URLSearchParams): Promise<WalletAuthorizationResponse | null> {
-  const encryptedData = urlParams.get('phantom_encryption_public_key');
-  const nonce = urlParams.get('nonce');
+  if (!walletPublicKeyBase58) {
+    walletPublicKeyBase58 = urlParams.get('solflare_encryption_public_key');
+    provider = 'Solflare';
+  }
+
+  // Extract critical MWA parameters
+  const data = urlParams.get('data'); // Encrypted payload (Base58)
+  const nonce = urlParams.get('nonce'); // Nonce (Base58)
   const sessionId = urlParams.get('session');
-  
-  if (!encryptedData || !nonce || !sessionId) {
-    console.error('❌ Missing required Phantom response parameters');
+
+  // Validate presence
+  if (!walletPublicKeyBase58 || !data || !nonce || !sessionId) {
+    // Only log error if we expected a return (avoids log noise on normal page loads)
+    if (urlParams.has('mobile_return')) {
+      console.error('❌ Missing required mobile wallet response parameters');
+    }
     return null;
   }
   
@@ -263,9 +267,17 @@ async function parsePhantomResponse(urlParams: URLSearchParams): Promise<WalletA
   }
   
   try {
-    const walletAuthResponse = await decryptMobileWalletResponse(encryptedData, nonce, session.privateKey);
+    console.log(`📱 Parsing ${provider} mobile response...`);
     
-    console.log('✅ Phantom wallet connected:', walletAuthResponse.publicKey);
+    // CRITICAL FIX: Pass correct parameters to decryption
+    const walletAuthResponse = await decryptMobileWalletResponse(
+      data,               // Encrypted Payload
+      nonce,              // Nonce
+      walletPublicKeyBase58, // Wallet's Ephemeral Public Key
+      session.privateKey  // App's Ephemeral Private Key
+    );
+    
+    console.log(`✅ ${provider} wallet connected:`, walletAuthResponse.publicKey);
     
     return {
       publicKey: walletAuthResponse.publicKey,
@@ -273,45 +285,11 @@ async function parsePhantomResponse(urlParams: URLSearchParams): Promise<WalletA
       walletUriBase: urlParams.get('wallet_uri_base') || undefined
     };
   } catch (error) {
-    console.error('❌ Failed to decrypt Phantom response:', error);
+    console.error(`❌ Failed to decrypt ${provider} response:`, error);
     throw new Error('Failed to decrypt wallet response. Please try again or check console for details.');
   }
 }
 
-/**
- * Parse Solflare mobile wallet response
- */
-async function parseSolflareResponse(urlParams: URLSearchParams): Promise<WalletAuthorizationResponse | null> {
-  const encryptedData = urlParams.get('solflare_encryption_public_key');
-  const nonce = urlParams.get('nonce');
-  const sessionId = urlParams.get('session');
-  
-  if (!encryptedData || !nonce || !sessionId) {
-    console.error('❌ Missing required Solflare response parameters');
-    return null;
-  }
-  
-  const session = getMobileWalletSession();
-  if (!session || session.sessionId !== sessionId) {
-    console.error('❌ Session mismatch or expired');
-    return null;
-  }
-  
-  try {
-    const walletAuthResponse = await decryptMobileWalletResponse(encryptedData, nonce, session.privateKey);
-    
-    console.log('✅ Solflare wallet connected:', walletAuthResponse.publicKey);
-    
-    return {
-      publicKey: walletAuthResponse.publicKey,
-      authToken: urlParams.get('auth_token') || undefined,
-      walletUriBase: urlParams.get('wallet_uri_base') || undefined
-    };
-  } catch (error) {
-    console.error('❌ Failed to decrypt Solflare response:', error);
-    throw new Error('Failed to decrypt wallet response. Please try again or check console for details.');
-  }
-}
 
 // ============================================
 // CRYPTOGRAPHY UTILITIES
@@ -337,47 +315,50 @@ async function generateEphemeralKeypair(): Promise<{ publicKey: string; privateK
  * Uses session private key and wallet's ephemeral public key
  */
 async function decryptMobileWalletResponse(
-  encryptedData: string,
-  nonce: string,
-  sessionPrivateKey: string
+  encryptedData: string, // Base58 encoded string from URL ('data')
+  nonce: string,         // Base58 encoded string from URL ('nonce')
+  walletPublicKey: string, // Base58 encoded string from URL ('...encryption_public_key')
+  sessionPrivateKey: string // Base64 encoded string from LocalStorage
 ): Promise<{ publicKey: string }> {
   
-  // 1. Decode inputs from URL parameters
-  const encryptedBytes = base64ToArrayBuffer(encryptedData);
-  const nonceBytes = base64ToArrayBuffer(nonce);
+  // 1. Decode inputs using correct formats
+  // URL parameters from wallet are Base58 encoded
+  const ciphertext = bs58.decode(encryptedData);
+  const nonceBytes = bs58.decode(nonce);
+  const walletPublicKeyBytes = bs58.decode(walletPublicKey);
+  
+  // Local session key is Base64 encoded
   const privateKeyBytes = base64ToArrayBuffer(sessionPrivateKey);
   
-  // 2. The wallet's ephemeral public key is the first 32 bytes of the encrypted data
-  const walletPublicKeyBytes = encryptedBytes.slice(0, 32);
-  const boxEncryptedMessage = encryptedBytes.slice(32);
-  
-  // 3. Decrypt the message using nacl.box.open()
+  // 2. Decrypt the message using nacl.box.open()
   const decryptedMessage = nacl.box.open(
-    boxEncryptedMessage,
+    ciphertext,
     nonceBytes,
     walletPublicKeyBytes,
     privateKeyBytes
   );
 
   if (!decryptedMessage) {
-    // THIS IS WHERE THE PREVIOUS ERROR WAS TRACEABLE TO.
     throw new Error('Failed to decrypt response: Invalid key or nonce.');
   }
 
-  // 4. Decrypted message is a JSON string of the authorized connection response
+  // 3. Decrypted message is a JSON string
   const jsonString = new TextDecoder().decode(decryptedMessage);
   
   try {
     const response = JSON.parse(jsonString);
     
-    // The response is expected to contain the wallet's public key in base58 format
-    if (typeof response.publicKey === 'string' && response.publicKey.length > 32) {
+    // 4. Extract the user's permanent wallet public key
+    // NOTE: Different wallets might return 'public_key' vs 'publicKey'
+    const userPublicKey = response.public_key || response.publicKey;
+
+    if (typeof userPublicKey === 'string') {
         return {
-            publicKey: response.publicKey // Base58 encoded wallet public key
+            publicKey: userPublicKey
         };
     }
     
-    throw new Error('Decrypted payload missing public key.');
+    throw new Error('Decrypted payload missing public_key.');
   } catch (error) {
     throw new Error(`Failed to parse decrypted message: ${error}`);
   }
