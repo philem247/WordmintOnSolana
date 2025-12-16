@@ -8,7 +8,7 @@
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org)
 
-[Live Demo](https://wordmint-on-solana-16vh.vercel.app/) • [Solana Explorer](https://explorer.solana.com/?cluster=devnet)
+[Live Demo](https://wordmint-on-solana-16vh.vercel.app/) • [Solana Explorer](https://explorer.solana.com/address/BHC25zEXbaEe3dQ1E2XWCycCThFtjhfgS2aDjmcizMgz?cluster=devnet)
 
 </div>
 
@@ -401,15 +401,12 @@ https://explorer.solana.com/tx/[signature]?cluster=devnet
 
 ### Two Connection Methods
 
-#### Method 1: In Wallet's Browser (Recommended ✅)
+#### Method 1: In Wallet's Browser
 
 1. Open Phantom or Solflare app on your phone
 2. Tap the "Browser" or "Discover" tab
 3. Navigate to WordMint URL in the wallet's browser
 4. Wallet is auto-injected → instant connection
-5. Full audio support works!
-
-**This is the reliable way** that works 100% of the time.
 
 #### Method 2: Regular Mobile Browser (Safari/Chrome)
 
@@ -596,47 +593,6 @@ npm run build
 npm run test:blockchain
 ```
 
-### Testing Checklist
-
-**Wallet Connection:**
-- [ ] Phantom desktop extension
-- [ ] Solflare desktop extension
-- [ ] Phantom mobile in-app browser
-- [ ] Solflare mobile in-app browser
-- [ ] Session persistence on reload
-- [ ] Disconnect and reconnect
-
-**Gameplay:**
-- [ ] All difficulty modes work
-- [ ] Audio pronunciation works
-- [ ] Timer counts down correctly
-- [ ] Correct answers award WMINT
-- [ ] Incorrect answers reset streak
-- [ ] Streak bonuses calculate correctly
-- [ ] Level bonuses calculate correctly
-
-**Blockchain:**
-- [ ] Token claim creates transaction
-- [ ] Transaction appears on Explorer
-- [ ] Tokens minted to correct wallet
-- [ ] Balance updates after claim
-- [ ] Duplicate claims prevented
-- [ ] Error handling for failed transactions
-
-**Achievements:**
-- [ ] Achievements unlock correctly
-- [ ] Progress bars update in real-time
-- [ ] Rarity badges display properly
-- [ ] Special achievements trigger
-
-**Leaderboard:**
-- [ ] Top 10 players displayed
-- [ ] Current player highlighted
-- [ ] Scores update after claims
-- [ ] Auto-refresh works
-
----
-
 ## 🔐 Security
 
 ### Current Implementation (Devnet)
@@ -712,71 +668,8 @@ npm run test:blockchain
 - [x] Session persistence
 - [x] Anti-duplicate claims
 
-### 📈 Statistics
-
-- **Lines of Code**: 7,500+
-- **Components**: 20+
-- **Blockchain Calls**: 3 (documented)
-- **Game States**: 8
-- **Wallet States**: 6
-- **Achievements**: 25
-- **Word Database**: 300 terms
-- **API Endpoints**: 10
-- **Documentation**: 15,000+ lines
-- **Bug Count**: **0** ✅
-
-### 🏆 Code Quality
-
-- ✅ TypeScript for type safety
-- ✅ Clean architecture
-- ✅ No code duplication
-- ✅ Proper error handling
-- ✅ Security best practices
-- ✅ No console warnings
-- ✅ Production-ready
-
-### 🎯 Hackathon Ready
-
-**Status:** ✅ **PRODUCTION READY FOR SOLANA HACKATHON**
-
-The WordMint codebase has been thoroughly reviewed, all critical bugs have been fixed, and the code is clean, secure, and well-documented. Perfect for Solana hackathons, GameFi demonstrations, Web3 education, and blockchain portfolio projects.
-
----
 
 ## 🔧 Troubleshooting
-
-### Common Issues & Solutions
-
-#### "WORDMINT_MINT_AUTHORITY not configured"
-
-**Solution:**
-```bash
-# Display your keypair
-cat ~/wordmint-mint-authority.json
-
-# Copy the ENTIRE array (including brackets)
-# Paste into environment variable
-# Format: [123,45,67,...]
-```
-
-#### "Invalid WORDMINT_MINT_AUTHORITY format"
-
-**Problem:** You pasted the public key instead of the secret array.
-
-**Solution:**
-- ❌ Wrong: `BUamPWLRVoMSi7LsX4Mox4kwq4DyCc7uDRVLx6n9PVva` (public key)
-- ✅ Right: `[49,87,133,214,...]` (secret array)
-
-#### "Insufficient SOL for transaction fee"
-
-**Solution:**
-```bash
-# Check mint authority balance
-solana balance $(solana-keygen pubkey ~/wordmint-mint-authority.json)
-
-# Airdrop SOL if needed
-solana airdrop 2 $(solana-keygen pubkey ~/wordmint-mint-authority.json)
-```
 
 #### Token balance not updating
 
