@@ -1,8 +1,8 @@
-# WordMint: Solana-Powered Word Game
+# WordMint: Solana-Powered Spell-to-Earn Game
 
 <img width="1608" height="828" alt="WordMint Game Design and 135 more pages - Personal - Microsoft​ Edge 12_16_2025 2_44_57 PM" src="https://github.com/user-attachments/assets/98e893a2-d928-45c3-b68f-0c11bbea1c63" />
 
-**WordMint** is a "Play-and-Own" word game built on Solana. It bridges the gap between casual gaming and blockchain ownership by offering a seamless mobile wallet connection experience and tangible rewards for player skill.
+**WordMint** is a "Spell-to-Earn" word game built on Solana. It bridges the gap between casual gaming and blockchain ownership by offering a seamless mobile wallet connection experience and tangible rewards for player skill.
 
 https://wordmint-on-solana-16vh.vercel.app/
 
