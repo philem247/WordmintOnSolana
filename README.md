@@ -4,6 +4,8 @@
 
 **WordMint** is a "Play-and-Own" word game built on Solana. It bridges the gap between casual gaming and blockchain ownership by offering a seamless mobile wallet connection experience and tangible rewards for player skill.
 
+https://wordmint-on-solana-16vh.vercel.app/
+
 ---
 
 ## 🧐 The Problem
