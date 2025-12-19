@@ -8,7 +8,6 @@
 
 ## 📺 Watch the Demo
 [![WordMint Demo](https://img.youtube.com/vi/CHnyTIq5g1g/0.jpg)](https://www.youtube.com/watch?v=CHnyTIq5g1g)
-*A 1-minute 20-second walkthrough of our custom MWA protocol and on-chain reward system.*
 
 ---
 
