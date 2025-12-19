@@ -2,12 +2,21 @@
 
 <img width="1608" height="828" alt="WordMint Game Design and 135 more pages - Personal - Microsoft​ Edge 12_16_2025 2_44_57 PM" src="https://github.com/user-attachments/assets/98e893a2-d928-45c3-b68f-0c11bbea1c63" />
 
+
 **WordMint** is a "Spell-to-Earn" word game built on Solana. It bridges the gap between casual gaming and blockchain ownership by offering a seamless mobile wallet connection experience and tangible rewards for player skill.
+
+
 
 ### 🚀 Live Demo - https://wordmint-on-solana-16vh.vercel.app/
 
+
+
 ## 📺 Watch the Demo
 [![WordMint Demo](https://img.youtube.com/vi/CHnyTIq5g1g/0.jpg)](https://www.youtube.com/watch?v=CHnyTIq5g1g)
+
+
+
+[📄 View our Pitch Deck (PDF)](https://drive.google.com/file/d/1y6huNuoPRTNDVJ-8oJrt2QSB8LBMLgjA/view?usp=sharing)
 
 ---
 
