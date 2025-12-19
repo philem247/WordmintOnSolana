@@ -4,7 +4,11 @@
 
 **WordMint** is a "Spell-to-Earn" word game built on Solana. It bridges the gap between casual gaming and blockchain ownership by offering a seamless mobile wallet connection experience and tangible rewards for player skill.
 
-https://wordmint-on-solana-16vh.vercel.app/
+### 🚀 Live Demo - https://wordmint-on-solana-16vh.vercel.app/
+
+## 📺 Watch the Demo
+[![WordMint Demo](https://img.youtube.com/vi/CHnyTIq5g1g/0.jpg)](https://www.youtube.com/watch?v=CHnyTIq5g1g)
+*A 1-minute 20-second walkthrough of our custom MWA protocol and on-chain reward system.*
 
 ---
 
@@ -50,54 +54,13 @@ Core interaction layer for querying the blockchain and managing connection state
 
 ---
 
-## 🚀 How to Run Locally
-
-Follow these steps to set up the project on your local machine.
-
-### Prerequisites
-* Node.js (v18 or higher)
-* npm or yarn
-
-### Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/philem247/WordMint-Game-Design.git](https://github.com/philem247/WordMint-Game-Design.git)
-    cd wordmintonsolana
-    ```
-
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    # This installs critical packages like @solana/web3.js, bs58, and tweetnacl
-    ```
-
-3.  **Set up Environment Variables:**
-    Create a `.env` file in the root directory and add your Supabase credentials (if needed for the leaderboard):
-    ```env
-    VITE_SUPABASE_URL=your_supabase_url
-    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-    ```
-
-4.  **Run the development server:**
-    ```bash
-    npm run dev
-    ```
-
-5.  **Open in Browser:**
-    Navigate to `http://localhost:5173` to see the app.
-
----
-
 ## 📱 How to Demo (Mobile Flow)
-
-**Crucial Note:** To test the Mobile Wallet Adapter deep link flow, the application must be running on a public HTTPS URL (like Vercel), not localhost, as mobile wallets cannot redirect back to localhost.
 
 1.  **Open the Live URL:** Access the deployed game link on your mobile device (iOS/Android) using Chrome or Safari.
 2.  **Tap "Connect Wallet":** Select **Phantom** or **Solflare**.
 3.  **Approve Connection:** The app will deep link you to the wallet app. Approve the connection.
 4.  **Return to Game:** You will be securely redirected back to the game browser with an active session.
-5.  **Play & Earn:** Complete a word puzzle. Upon success, check the "Rewards" tab to see your token balance update.
+5.  **Play & Earn:** Complete a game session. Upon success, check the "Rewards" tab to see your token balance update.
 
 ---
 
