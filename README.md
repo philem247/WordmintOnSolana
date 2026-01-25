@@ -7,26 +7,26 @@
 
 
 
-### 🚀 Live Demo - https://wordmint-on-solana-16vh.vercel.app/
+### Live Demo - https://wordmint-on-solana-16vh.vercel.app/
 
 
 
-## 📺 Watch the Demo
+## Watch the Demo
 [![WordMint Demo](https://img.youtube.com/vi/CHnyTIq5g1g/0.jpg)](https://www.youtube.com/watch?v=CHnyTIq5g1g)
 
 
 
-[📄 View our Pitch Deck (PDF)](https://drive.google.com/file/d/1y6huNuoPRTNDVJ-8oJrt2QSB8LBMLgjA/view?usp=sharing)
+[View our Pitch Deck (PDF)](https://drive.google.com/file/d/1y6huNuoPRTNDVJ-8oJrt2QSB8LBMLgjA/view?usp=sharing)
 
 ---
 
-## 🧐 The Problem
+## The Problem
 
 1.  **Mobile Crypto UX is Broken:** Connecting a crypto wallet on mobile web browsers is often clunky, error-prone or requires users to stay trapped inside a wallet's in-app browser.
 2.  **Lack of Ownership:** In traditional word games, players spend hours achieving high scores and unlocking items, but they never truly own their achievements or rewards.
 3.  **High Barrier to Entry:** Most crypto games require expensive NFTs or complex setups before a user can even play the first level.
 
-## 💡 The Solution
+## The Solution
 
 **WordMint** solves these issues with a polished, user-friendly experience:
 
@@ -36,7 +36,7 @@
 
 ---
 
-## 🛠 Solana Components & Tech Stack
+## Solana Components & Tech Stack
 
 This project leverages the Solana blockchain to provide a fast and secure gaming experience.
 
@@ -72,7 +72,7 @@ Core interaction layer for querying the blockchain and managing connection state
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 * `src/components/` - UI Components (Game board, Wallet buttons, Reward screens).
 * `src/utils/` - Logic for Solana connection, cryptography, and game rules.
@@ -81,5 +81,3 @@ Core interaction layer for querying the blockchain and managing connection state
 * `src/styles/` - Global Tailwind CSS styles.
 
 ---
-
-*Built with ❤️ for the Solana Student Hackathon.*
